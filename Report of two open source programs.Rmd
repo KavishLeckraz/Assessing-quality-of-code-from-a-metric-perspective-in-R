@@ -1,0 +1,70 @@
+---
+title: "CS3003 1923149 Resubmission"
+output: pdf_document
+bibliography: reference.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("ggplot2")
+```
+
+## Section 1 - Introduction
+
+The two open-source systems I have chosen to compare are Apache Camel and Xerces. The purpose of this report will examine aspects of these systems, based on analysis of Henry and Kafura's (H&K) metric **fan-out** in concurrence with the number of **bugs** in occurrence in the class and **lines of code** (LOC). The latter section will discuss whether the analysis shows good or poor qualities within their respective systems.
+
+Software is repeatedly updated for various reasons, whether it be adaptive, corrective, perfective or preventative. It is important for developers to maintain a, 'close eye', on a system to be able to understand how to solve a bug or an error, when one arises. This brings about the motivation for using fan-out. The metrics measures the number of processes or functions within a module, which is called by another module. This is key within an object-oriented system as the H&K metric relates to the interaction between objects. If changes were to happen in a module (for the reasons above), a developer must understand whether the changes will work or cause issues with other objects which interact with the changed module. Each time a code-base is altered to implement new functionality or to fix a defect, you introduce risk. That risk increases as you go about the coupled objects, if the alterations are incoherent, will cause a 'ripple effect' of errors or bugs [@Borysowich]. This brings us to the reason for picking bugs as our second metric to analyse the systems. Fixing a bug involves figuring out why the software behaves erroneously, and subsequently correcting that component causing the erroneous behavior [@Zeller]. Tracking bug reports play an important role in the software development life cycle, since a large number of bugs within a module may be a signal to focus on testing and implementing new features [@Bugs]. Since we must evaluate the quality of these systems the use of lines of code metric are used to assess a projects performance and efficiency. Furthermore, it may be used in cost estimation and is also easy to estimate the efforts [@tarunsinghwap7]. 
+
+## Section 2: Analysis & Discussion of results.
+
+```{r data, include=FALSE}
+library(readxl)
+data = read_excel('/Users/KavishLeckraz 1/Documents/Mathematics With Computer Science/Year 3/CS3003 SE/Labs/coursework_data.xlsx')
+camel = subset(data, System == 'camel', select = c(2,9,10,13))
+xerces = subset(data, System == 'xerces', select = c(2,9,10,13))
+```
+
+To begin with a 'quick' overview of both programmes utilising basic statistics. In total Camel contains 3575 classes whereas Xerces has 1937 classes, the data table below presents statistics of the LOC, fan-out and bugs found in both systems respective classes. Comparing the median to the mean we find that for both systems the metrics are positively skewed (mean > median). This means that in both systems there is a higher frequency of classes which have relatively high values for our chosen metrics. Both systems exhibits a mean low-to-medium fan-out range (5.6, 2.9) this tell us that a reasonable amount of high-level classes use lower-level utility classes that are themselves high fan-in. Both display good design principles in that aspect, as its more desirable to have less overly complex classes (low-to-medium average fan-out). You probably could re-factor more modules into smaller, less complex parts within Camel (as the third quartile is high, 7). The next metric in the data table shows on average the classes within the system Xerces, are 3x longer in terms of LOC. In terms of the functionality, it is hard to tell whether this is good for a system (as it just suggest that on average Xerces classes have more complexity and functionality). Although from a design aspect, Xerces will have a higher probability of error/failure in the future (of its life cycle) as the system version is updated and passed from developer to developer. This is because it will take a greater deal of time and effort to read, analyse, test or re-factor large LOC classes. Since there is no ideal length of code as a rule of thumb functions should be coded below 100 LOC (though this may be impossible in some cases). It’s easy to see form the table that Camel exhibits fewer bugs than Xerces overall its classes, indicative of the design principles discussed above.
+
+```{r}
+summary(camel)
+summary(xerces)
+```
+
+Following into correlation analysis, we shall look for any relationships between the metrics. We can start by visualizing these relationships on a scatterplot (below), as it identifies the direction of the correlation. In this case between all metrics shows a positive correlation within their respective systems. Both Camel and Xerces exhibit a strong correlation (0.66 and 0.62 respectively) between the relationship of fan-out and LOC, therefore having direct impact on each other. If we compare the plots for these two metrics, in the respective systems, we see that Camel's data points are less sparse compared to Xerces. In addition Camel's data points does not exceed 3000 for LOC, furthermore, has a higher fan-out. This suggest that Camels classes which operate a high fan-out, have been simplified either through re-factoring or encapsulation. Since Camel's classes perform either more or equal amount of functionality and is written efficiently, shows the quality, time and effort put in to the re-factoring. Next lets inspect the correlation these metrics have within their respective systems. Both camel and Xerces exhibit a strong correlation (0.66 and 0.62 respectively) between fan-out and LOC, this suggest that the classes which provide additional functionality have too many lines of code thus require further encapsulation and re-factoring, to prevent the likelihood of bugs or errors appearing. Again both systems exhibit medium correlation (0.35 and 0.29 respectively) between bugs and LOC, this suggest that some of the bugs are likely to be there due to the length of code some classes display, but both show good quality in terms of LOC. The correlation between fan-out and bugs however, differ for the two systems. Camel shows a medium (0.26) correlation and Xerces has a strong (0.51) correlation for the two metrics. This tell us that Xerces has a poorer quality of code in terms of classes being called by another class. Camel has a better quality of code since the system has encapsulated function into more classes (as apparent by the larger number of modules). Suggestions would be to re-factor these methods within the classes via the extract method. The discussion above is further backed by the scatter plot figures below. Camel further emits quality, whereas the opposite for Xerces, by analysing the correlation between fan-out and bugs. Xerces shows a strong correlation between fan-out and bugs (0.51). The graph implies many classes within Xerces are 'god' classes (extreme values), suggesting there are too many complex classes which are lead to bugs. On the other hand, Camel has a weak (0.26) correlation between fan-out and bugs, implying greater quality of code (as less bugs presented with similar fan-out size's). Both systems exhibit weak correlation between loc and bugs (0.35, 0.3), suggesting class size doesn’t necessarily do the same. The complexity of code rather than length might be a strong contributing factor the bugs. The discussion above is further backed by the scatter plot figures below.
+
+Now let's take a look at the classes (from both system) with the largest number of bugs. Camel's three classes which has the most bugs are, org.apache.camel.model.ProcessorType, org.apache.camel.Exchange and org.apache.camel.impl.DefaultCamelContext. The classes .ProcessorType and .DefaultCamelContext display very high fan-out (53 & 44) and loc (1012 & 1510) values, so coupling may be the reason this class is problematic mediated by loc. Developers are increasingly prone to mistakes the larger a class is in terms of changes which affect other parts of the system, furthermore mediated by loc, thus a cycle of error's causing bugs. If we have a look within the ProcessorTpye class we can see a lot of methods, many which parse XLM files to categorise into specific types to compress. Which in turn is used by the .DefaultCamelContext which add these 'type' to objects to be used later. Which in turn is coupled a lot also having lots of lines of code that subsequently 'smells' (of poor standards). I believe that these types of classes will need to be re-factored using the extract method as this will help group together the function of the class. In comparison the classes with the most bugs in Xerces system is org.apache.xerces.impl.xs.XMLSchemaValidator, org.apache.xerces.impl.XMLEntityManager and org.apache.xerces.parsers.AbstractDOMParser. The classes .XMLSchemaValidator and .XMLEntityManager display very high fan-out (47 & 22) and loc (3157 & 1373) values. Diving into these classes we see that again that this contains a more methods which perform different outcomes i.e. The validator implements a document filter by receiving document events from the scanner which are validating the content and structure by augmenting the information set. Notifying the parser of the information resulting from the validation process. This results in the class containing too many methods to keep track of realistically. Furthermore, the description of what some methods achieve overly complicated and hard to interpret naming comvention. 
+
+Everything so far has been an analysis of the quality these systems in terms of bugs, however quality is also a measure of how efficient and how much effort has been put into coding. This means that classes, in theory, with less amount of LOC that perform a function to the fullest extent, display good quality. Camel shows quality the most, its purpose is a framework for message-oriented middleware, which means interaction between objects is paramount. To overcome the possibility of bugs or errors occurring it is known the encapsulation and low fan-out is desirable, as explained above causes easy updates/testing etc. Thus classes are prevented causing a ripple effect when a change occurs to the code. As the scatter plots show, Xerces classes perform too many functions (fan-out), apparent as there are far more points dispersed from the cluster with huge amounts of LOC, most over a thousand lines of code. This is too unrealistic for any one person to read and coherent changes everywhere. Xerces is certainly more complex in term of a product outcome, since the programme is designed for parsing, validating, serializing and manipulating XML into various computer languages. By its nature its complex but this does not need to be its downfall, with the right implementation of re-factoring it would alleviate its code smells whist increasing further its business value.  Although Camel may be larger, Xerces exhibits on average more bugs, the less bugs the greater the quality. Fan-out is directly correlated to the probability of a bug [@Alvin]. To conclude, in my overall opinion, on which system shows a higher quality of code, I believe Camel to be well thought through and designed compared to Xerces as disscussed. Moreover, Camel had a more coherent naming convention, hence made it easier to understand the what the code outputs.
+
+```{r, include=FALSE}
+sort_camelB = camel[order(camel$BUGS),]
+sort_xercesB = xerces[order(xerces$BUGS),]
+sort_camelF = camel[order(camel$`fan-out`),]
+sort_xercesF= xerces[order(xerces$`fan-out`),]
+sort_camelL = camel[order(camel$LOC),]
+sort_xercesL = xerces[order(xerces$LOC),]
+```
+
+```{r, out.width="75%", out.height="75%"}
+plot(xerces$BUGS,xerces$`fan-out`, main="Xerces: fan-out vs bugs")
+abline(lm(xerces$BUGS~xerces$`fan-out`), col="red")
+
+plot(xerces$BUGS,xerces$LOC, main="Xerces: loc vs bugs")
+abline(lm(xerces$BUGS~xerces$LOC), col="red")
+
+plot(xerces$`fan-out`,xerces$LOC, main="Xerces: loc vs fan-out")
+abline(lm(xerces$LOC~xerces$`fan-out`), col="red")
+
+plot(camel$BUGS,camel$`fan-out`, main="Camel: fan-out vs bugs")
+abline(lm(camel$BUGS~camel$`fan-out`), col="red")
+
+plot(camel$BUGS,camel$LOC, main="Camel: loc vs bugs", log = 'y')
+abline(lm(camel$BUGS~camel$LOC), col="red")
+
+plot(camel$`fan-out`,camel$LOC, main="Camel: loc vs fan-out")
+abline(lm(camel$LOC~camel$`fan-out`), col="red")
+
+```
+
+## Bibliography 
